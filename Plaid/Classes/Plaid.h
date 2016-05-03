@@ -200,6 +200,7 @@ typedef void (^PlaidMfaCompletion)(PLDAuthentication *authentication, id respons
                      username:(NSString *)username
                      password:(NSString *)password
                          type:(NSString *)type
+               includeAccount:(BOOL)accountFlag
                       options:(NSDictionary *)options
                    completion:(PlaidMfaCompletion)completion;
 
@@ -218,6 +219,7 @@ typedef void (^PlaidMfaCompletion)(PLDAuthentication *authentication, id respons
                      password:(NSString *)password
                           pin:(NSString *)pin
                          type:(NSString *)type
+               includeAccount:(BOOL)accountFlag
                       options:(NSDictionary *)options
                    completion:(PlaidMfaCompletion)completion;
 
@@ -235,6 +237,7 @@ typedef void (^PlaidMfaCompletion)(PLDAuthentication *authentication, id respons
 - (void)stepLinkUserForProduct:(PlaidProduct)product
                    publicToken:(NSString *)publicToken
                    mfaResponse:(id)mfaResponse
+                includeAccount:(BOOL)accountFlag
                        options:(NSDictionary *)options
                     completion:(PlaidMfaCompletion)completion;
 
