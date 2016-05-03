@@ -184,6 +184,7 @@ static NSString * LinkHostForEnvironment(PlaidEnvironment environment) {
                      username:(NSString *)username
                      password:(NSString *)password
                          type:(NSString *)type
+               includeAccount:(BOOL)accountFlag
                       options:(NSDictionary *)options
                    completion:(PlaidMfaCompletion)completion {
   [self addLinkUserForProduct:product
@@ -191,6 +192,7 @@ static NSString * LinkHostForEnvironment(PlaidEnvironment environment) {
                      password:password
                           pin:nil
                          type:type
+               includeAccount:accountFlag
                       options:options
                    completion:completion];
 }
@@ -200,11 +202,11 @@ static NSString * LinkHostForEnvironment(PlaidEnvironment environment) {
                      password:(NSString *)password
                           pin:(NSString *)pin
                          type:(NSString *)type
+               includeAccount:(BOOL)accountFlag
                       options:(NSDictionary *)options
                    completion:(PlaidMfaCompletion)completion {
   NSMutableDictionary *parameters = [[NSMutableDictionary alloc] initWithDictionary:@{
     @"env" : NSStringFromPlaidEnviroment(_environment),
-    @"include_accounts": @(NO),
     @"institution_type": type,
     @"username": username,
     @"password": password,
@@ -216,6 +218,11 @@ static NSString * LinkHostForEnvironment(PlaidEnvironment environment) {
   }
   if (pin) {
     parameters[@"pin"] = pin;
+  }
+  if (accountFlag) {
+    parameters[@"include_accounts"] = @(YES);
+  } else {
+    parameters[@"include_accounts"] = @(NO);
   }
   [_networkApi executeRequestWithHost:LinkHostForEnvironment(_environment)
                                  path:@"authenticate"
@@ -234,18 +241,17 @@ static NSString * LinkHostForEnvironment(PlaidEnvironment environment) {
   }];
 }
 
-
-
 - (void)stepLinkUserForProduct:(PlaidProduct)product
                    publicToken:(NSString *)publicToken
                    mfaResponse:(id)mfaResponse
+                includeAccount:(BOOL)accountFlag
                        options:(NSDictionary *)options
                     completion:(PlaidMfaCompletion)completion {
   NSString *webhook = @"";
   if (options[@"webhook"]) {
     webhook = options[@"webhook"];
   }
-  NSDictionary *parameters = @{
+    NSMutableDictionary *parameters = [[NSMutableDictionary alloc] initWithDictionary:@{
     @"env" : NSStringFromPlaidEnviroment(_environment),
     @"include_accounts": @(NO),
     @"mfa": mfaResponse,
@@ -253,7 +259,12 @@ static NSString * LinkHostForEnvironment(PlaidEnvironment environment) {
     @"public_key": _publicKey,
     @"public_token": publicToken,
     @"webhook": webhook
-  };
+  }];
+  if (accountFlag) {
+   parameters[@"include_accounts"] = @(YES);
+  } else {
+   parameters[@"include_accounts"] = @(NO);
+  }
   [_networkApi executeRequestWithHost:LinkHostForEnvironment(_environment)
                                  path:@"authenticate/mfa"
                                method:@"POST"
